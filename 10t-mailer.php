@@ -20,6 +20,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'TENT_MAILER_DATABASE_VERSION', '1' );
 
 /**
+ * Loads classes in the TenT\Mailer namespace from the src directory.
+ *
+ * @param string $class_name Fully qualified class name.
+ * @return void
+ */
+function tent_mailer_autoload( string $class_name ): void {
+	$namespace_prefix = 'TenT\\Mailer\\';
+
+	if ( ! str_starts_with( $class_name, $namespace_prefix ) ) {
+		return;
+	}
+
+	$relative_class = substr( $class_name, strlen( $namespace_prefix ) );
+	$file           = __DIR__ . '/src/' . str_replace( '\\', '/', $relative_class ) . '.php';
+
+	if ( is_readable( $file ) ) {
+		require_once $file;
+	}
+}
+
+/**
  * Creates or updates the plugin's database tables.
  *
  * The log table is shared across a multisite network. Access to its records
@@ -86,3 +107,7 @@ function tent_mailer_deactivate( bool $network_wide = false ): void {
 
 register_activation_hook( __FILE__, 'tent_mailer_activate' );
 register_deactivation_hook( __FILE__, 'tent_mailer_deactivate' );
+
+spl_autoload_register( 'tent_mailer_autoload' );
+
+( new TenT\Mailer\Plugin() )->register();
