@@ -7,6 +7,8 @@
 
 namespace TenT\Mailer;
 
+use TenT\Mailer\Admin\SettingsPage;
+
 /**
  * Registers the plugin's runtime services with WordPress.
  */
@@ -20,6 +22,13 @@ final class Plugin {
 	private bool $registered = false;
 
 	/**
+	 * Plugin settings page.
+	 *
+	 * @var SettingsPage|null
+	 */
+	private ?SettingsPage $settings_page = null;
+
+	/**
 	 * Registers runtime services and hooks.
 	 *
 	 * @return void
@@ -30,6 +39,11 @@ final class Plugin {
 		}
 
 		add_action( 'plugins_loaded', array( $this, 'maybe_upgrade_database' ) );
+
+		if ( is_admin() ) {
+			$this->settings_page = new SettingsPage();
+			$this->settings_page->register();
+		}
 
 		$this->registered = true;
 	}
