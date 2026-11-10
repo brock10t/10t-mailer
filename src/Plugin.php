@@ -29,6 +29,17 @@ final class Plugin {
 			return;
 		}
 
+		add_action( 'plugins_loaded', array( $this, 'maybe_upgrade_database' ) );
+
 		$this->registered = true;
+	}
+
+	/**
+	 * Runs pending database schema upgrades.
+	 *
+	 * @return void
+	 */
+	public function maybe_upgrade_database(): void {
+		\tent_mailer_create_database_tables();
 	}
 }

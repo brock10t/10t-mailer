@@ -51,6 +51,12 @@ function tent_mailer_autoload( string $class_name ): void {
 function tent_mailer_create_database_tables(): void {
 	global $wpdb;
 
+	$installed_version = get_site_option( 'tent_mailer_database_version', '0' );
+
+	if ( TENT_MAILER_DATABASE_VERSION === $installed_version ) {
+		return;
+	}
+
 	$table_name      = $wpdb->base_prefix . '10t_mailer_logs';
 	$charset_collate = $wpdb->get_charset_collate();
 
@@ -79,6 +85,19 @@ function tent_mailer_create_database_tables(): void {
 	dbDelta( $sql );
 
 	update_site_option( 'tent_mailer_database_version', TENT_MAILER_DATABASE_VERSION );
+
+	$logger = new TenT\Mailer\Logging\Logger();
+	$logger->log(
+		TenT\Mailer\Logging\Logger::INFO,
+		'database.upgraded',
+		'database',
+		'10T Mailer database upgraded to version ' . TENT_MAILER_DATABASE_VERSION . '.',
+		array(
+			'from_version' => (string) $installed_version,
+			'to_version'   => TENT_MAILER_DATABASE_VERSION,
+		),
+		status: 'completed'
+	);
 }
 
 /**
