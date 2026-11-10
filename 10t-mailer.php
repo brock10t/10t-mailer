@@ -90,6 +90,16 @@ function tent_mailer_create_database_tables(): void {
  */
 function tent_mailer_activate( bool $network_wide = false ): void {
 	tent_mailer_create_database_tables();
+
+	$logger = new TenT\Mailer\Logging\Logger();
+	$logger->log(
+		TenT\Mailer\Logging\Logger::INFO,
+		'plugin.activated',
+		'plugin',
+		'10T Mailer activated.',
+		array( 'network_wide' => $network_wide ),
+		status: 'completed'
+	);
 }
 
 /**
@@ -102,7 +112,15 @@ function tent_mailer_activate( bool $network_wide = false ): void {
  * @return void
  */
 function tent_mailer_deactivate( bool $network_wide = false ): void {
-	// Deactivation tasks will be added when persistent services are introduced.
+	$logger = new TenT\Mailer\Logging\Logger();
+	$logger->log(
+		TenT\Mailer\Logging\Logger::INFO,
+		'plugin.deactivated',
+		'plugin',
+		'10T Mailer deactivated.',
+		array( 'network_wide' => $network_wide ),
+		status: 'completed'
+	);
 }
 
 register_activation_hook( __FILE__, 'tent_mailer_activate' );
