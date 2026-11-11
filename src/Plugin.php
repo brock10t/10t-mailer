@@ -8,6 +8,8 @@
 namespace TenT\Mailer;
 
 use TenT\Mailer\Admin\SettingsPage;
+use TenT\Mailer\Configuration\Configuration;
+use TenT\Mailer\Configuration\Resolver;
 
 /**
  * Registers the plugin's runtime services with WordPress.
@@ -29,6 +31,13 @@ final class Plugin {
 	private ?SettingsPage $settings_page = null;
 
 	/**
+	 * Effective configuration for the current site.
+	 *
+	 * @var Configuration|null
+	 */
+	private ?Configuration $configuration = null;
+
+	/**
 	 * Registers runtime services and hooks.
 	 *
 	 * @return void
@@ -39,6 +48,7 @@ final class Plugin {
 		}
 
 		add_action( 'plugins_loaded', array( $this, 'maybe_upgrade_database' ) );
+		$this->configuration = ( new Resolver() )->resolve();
 
 		if ( is_admin() ) {
 			$this->settings_page = new SettingsPage();
