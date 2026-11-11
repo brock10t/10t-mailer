@@ -22,6 +22,10 @@ The plugin is in early development. Its first supported transport will be SMTP, 
 
 10T Mailer is under active development and is not yet ready to handle email on production websites. Until a transport is explicitly configured and enabled, the plugin will not alter WordPress's normal email delivery behavior.
 
+## Changelog
+
+- v0.0.1 - Plugin Foundation: Activation, logging, and basic interfaces
+
 ## License
 
 10T Mailer is licensed under the GNU General Public License v2.0 or later. See [LICENSE](LICENSE) once included in the project.
