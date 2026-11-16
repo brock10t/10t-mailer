@@ -95,8 +95,12 @@ final class Keys {
 	 * @return mixed
 	 */
 	public static function normalize( string $key, mixed $value ): mixed {
-		if ( in_array( $key, array( self::ENABLED, self::SMTP_AUTHENTICATION ), true ) ) {
-			return self::normalize_boolean( $value );
+		if ( self::ENABLED === $key ) {
+			return self::normalize_boolean( $value, self::defaults()[ self::ENABLED ] );
+		}
+
+		if ( self::SMTP_AUTHENTICATION === $key ) {
+			return self::normalize_boolean( $value, self::defaults()[ self::SMTP_AUTHENTICATION ] );
 		}
 
 		if ( self::TRANSPORT === $key ) {
@@ -107,7 +111,7 @@ final class Keys {
 		}
 
 		if ( self::SMTP_PORT === $key ) {
-			return self::normalize_integer( $value, 1, 65535, self::defaults()[ self::SMTP_PORT ] );
+			return self::normalize_integer( $value, 1, 65535, 0 );
 		}
 
 		if ( self::SMTP_CONNECTION_TIMEOUT === $key ) {
@@ -115,7 +119,7 @@ final class Keys {
 				$value,
 				1,
 				300,
-				self::defaults()[ self::SMTP_CONNECTION_TIMEOUT ]
+				0
 			);
 		}
 
@@ -128,7 +132,7 @@ final class Keys {
 				true
 			)
 				? $encryption
-				: self::defaults()[ self::SMTP_ENCRYPTION ];
+				: '';
 		}
 
 		if ( self::SMTP_PASSWORD === $key ) {
@@ -189,22 +193,31 @@ final class Keys {
 	/**
 	 * Normalizes common boolean representations.
 	 *
-	 * @param mixed $value Raw value.
+	 * @param mixed $value    Raw value.
+	 * @param bool  $fallback Value returned when invalid.
 	 * @return bool
 	 */
-	private static function normalize_boolean( mixed $value ): bool {
+	private static function normalize_boolean( mixed $value, bool $fallback ): bool {
 		if ( is_bool( $value ) ) {
 			return $value;
 		}
 
 		if ( is_int( $value ) ) {
-			return 1 === $value;
+			return in_array( $value, array( 0, 1 ), true ) ? 1 === $value : $fallback;
 		}
 
 		if ( is_string( $value ) ) {
-			return in_array( strtolower( trim( $value ) ), array( '1', 'true', 'yes', 'on' ), true );
+			$value = strtolower( trim( $value ) );
+
+			if ( in_array( $value, array( '1', 'true', 'yes', 'on' ), true ) ) {
+				return true;
+			}
+
+			if ( in_array( $value, array( '0', 'false', 'no', 'off' ), true ) ) {
+				return false;
+			}
 		}
 
-		return false;
+		return $fallback;
 	}
 }
